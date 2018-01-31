@@ -19,8 +19,7 @@ public class ProductDAO {
             statement.setString(2, product.getName());
             statement.setString(3, product.getDescription());
             statement.setInt(4, product.getPrice());
-            int res = statement.executeUpdate();
-            System.out.println("Saving was finished with result " + res);
+            statement.executeUpdate();
         } catch (SQLException e) {
             System.err.println("Smth went wrong");
             e.printStackTrace();
@@ -35,8 +34,7 @@ public class ProductDAO {
             statement.setString(2, product.getName());
             statement.setString(3, product.getDescription());
             statement.setInt(4, product.getPrice());
-            int res = statement.executeUpdate();
-            System.out.println("Update was finished with result " + res);
+            statement.executeUpdate();
         } catch (SQLException e) {
             System.err.println("Smth went wrong");
             e.printStackTrace();
@@ -48,7 +46,7 @@ public class ProductDAO {
         try(Connection connection = getConnection();
             PreparedStatement statement = connection.prepareStatement("DELETE FROM PRODUCT WHERE ID = ?")) {
             statement.setLong(1, id);
-            int res = statement.executeUpdate();
+            statement.executeUpdate();
         } catch (SQLException e) {
             System.err.println("Smth went wrong");
             e.printStackTrace();
@@ -64,7 +62,6 @@ public class ProductDAO {
                 Product product = new Product(resultSet.getLong(1), resultSet.getString(2), resultSet.getString(3), resultSet.getInt(4));
                 list.add(product);
             }
-
             return list;
         } catch (SQLException e) {
             System.err.println("Smth went wrong");

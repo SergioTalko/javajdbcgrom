@@ -33,6 +33,19 @@ public class StorageDAO {
         return storage;
     }
 
+    public void delete (long id) throws Exception{
+        try(Connection connection = getConnection();
+            PreparedStatement statementStr = connection.prepareStatement("DELETE FROM STORAGE WHERE STORAGE_ID = ?")){
+            if(findById(id).getFiles().length > 0) throw new Exception("Cant delete storage with files. First you must delete all files in storage with id " + id);
+
+            statementStr.setLong(1, id);
+            statementStr.executeUpdate();
+
+        } catch (SQLException e) {
+            System.err.println("Some problem with deleting storage with id " + id + " , try again later.");
+        }
+    }
+
     public Storage findById(long id) throws Exception {
         Storage resultStorage = null;
         try (Connection connection = getConnection();

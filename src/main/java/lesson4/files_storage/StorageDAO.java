@@ -1,5 +1,6 @@
 package lesson4.files_storage;
 
+import java.io.FileNotFoundException;
 import java.nio.file.FileAlreadyExistsException;
 import java.sql.*;
 import java.util.ArrayList;
@@ -33,10 +34,11 @@ public class StorageDAO {
         return storage;
     }
 
-    public void delete (long id) throws Exception{
-        try(Connection connection = getConnection();
-            PreparedStatement statementStr = connection.prepareStatement("DELETE FROM STORAGE WHERE STORAGE_ID = ?")){
-            if(findById(id).getFiles().length > 0) throw new Exception("Cant delete storage with files. First you must delete all files in storage with id " + id);
+    public void delete(long id) throws Exception {
+        try (Connection connection = getConnection();
+             PreparedStatement statementStr = connection.prepareStatement("DELETE FROM STORAGE WHERE STORAGE_ID = ?")) {
+            if (findById(id).getFiles().length > 0)
+                throw new Exception("Cant delete storage with files. First you must delete all files in storage with id " + id);
 
             statementStr.setLong(1, id);
             statementStr.executeUpdate();
@@ -44,6 +46,32 @@ public class StorageDAO {
         } catch (SQLException e) {
             System.err.println("Some problem with deleting storage with id " + id + " , try again later.");
         }
+    }
+
+    public Storage update(Storage storage) throws Exception {
+
+        if (storage == null) throw new NullPointerException("Cant save null");
+        if (findById(storage.getId()) == null) throw new Exception("Cant find storage with id " + storage.getId());
+
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement("UPDATE STORAGE SET  FORMATS = ?, COUNTRY = ?, STORAGE_SIZE = ? WHERE STORAGE_ID = ?")) {
+
+
+            if (findFilesByStorageId(storage.getId()).length != 0)
+                throw new Exception("You try update info about storage with files.This changing might be not allowed here. So first delete files or transfer all files in another storage");
+
+            statement.setLong(1, storage.getId());
+            statement.setString(2, storage.getFormatsSupported());
+            statement.setString(3, storage.getStorageCountry());
+            statement.setLong(4, storage.getStorageSize());
+
+            statement.executeUpdate();
+
+
+        } catch (SQLException e) {
+            System.err.println("Cant update storage with id " + storage.getId() + " try again later.");
+        }
+        return storage;
     }
 
     public Storage findById(long id) throws Exception {
@@ -54,19 +82,20 @@ public class StorageDAO {
             ResultSet resultSet = statement.executeQuery();
 
 
-           if (resultSet.next()) {
-               String[] formats = resultSet.getString(2).split(",");
-               String country = resultSet.getString(3);
-               long size = resultSet.getLong(4);
+            if (resultSet.next()) {
+                String[] formats = resultSet.getString(2).split(",");
+                String country = resultSet.getString(3);
+                long size = resultSet.getLong(4);
 
 
-               resultStorage = new Storage(id, formats, country, size);
-               File[] files = findFilesByStorageId(id);
-               resultStorage.setFiles(files);
-           }
+                resultStorage = new Storage(id, formats, country, size);
+                File[] files = findFilesByStorageId(id);
+                resultStorage.setFiles(files);
+            }
 
         } catch (SQLException e) {
-            System.err.println("Smth went wrong when you try find storage with id" + id);;
+            System.err.println("Smth went wrong when you try find storage with id" + id);
+            ;
 
         }
         return resultStorage;

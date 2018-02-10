@@ -62,6 +62,19 @@ public class FileDAO {
         return resultFile;
     }
 
+    public void delete (long id) throws Exception{
+        try(Connection connection = getConnection();
+            PreparedStatement statementStr = connection.prepareStatement("DELETE FROM FILES WHERE FILE_ID = ?")){
+            if(findById(id) == null) throw new Exception("Cant find file with id "  + id);
+
+            statementStr.setLong(1, id);
+            statementStr.executeUpdate();
+
+        } catch (SQLException e) {
+            System.err.println("Some problem with deleting storage with id " + id + " , try again later.");
+        }
+    }
+
 
     private Connection getConnection() throws SQLException {
         return DriverManager.getConnection(DB_URL, USER, PASS);

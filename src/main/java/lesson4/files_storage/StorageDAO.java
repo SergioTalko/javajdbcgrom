@@ -60,16 +60,38 @@ public class StorageDAO {
             if (findFilesByStorageId(storage.getId()).length != 0)
                 throw new Exception("You try update info about storage with files.This changing might be not allowed here. So first delete files or transfer all files in another storage");
 
-            statement.setLong(1, storage.getId());
-            statement.setString(2, storage.getFormatsSupported());
-            statement.setString(3, storage.getStorageCountry());
-            statement.setLong(4, storage.getStorageSize());
+
+            statement.setString(1, storage.getFormatsSupported());
+            statement.setString(2, storage.getStorageCountry());
+            statement.setLong(3, storage.getStorageSize());
+            statement.setLong(4, storage.getId());
 
             statement.executeUpdate();
 
 
         } catch (SQLException e) {
             System.err.println("Cant update storage with id " + storage.getId() + " try again later.");
+        }
+        return storage;
+    }
+
+    public Storage updateSize(Storage storage) throws Exception {
+
+        if (storage == null) throw new NullPointerException("Cant save null");
+        if (findById(storage.getId()) == null) throw new Exception("Cant find storage with id " + storage.getId());
+
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement("UPDATE STORAGE SET STORAGE_SIZE = ? WHERE STORAGE_ID = ?")) {
+
+            statement.setLong(1, storage.getStorageSize());
+            statement.setLong(2, storage.getId());
+
+            statement.executeUpdate();
+
+
+        } catch (SQLException e) {
+            System.err.println("Cant update storage size with id " + storage.getId() + " try again later.");
+            e.printStackTrace();
         }
         return storage;
     }
@@ -102,7 +124,7 @@ public class StorageDAO {
     }
 
 
-    private File[] findFilesByStorageId(long id) throws FileMatchException {
+    public File[] findFilesByStorageId(long id) throws FileMatchException, SQLException {
         List<File> files = new ArrayList<>();
         try (Connection connection = getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT * FROM FILES WHERE STORAGE_ID = ?")) {
@@ -121,8 +143,9 @@ public class StorageDAO {
             }
         } catch (SQLException e) {
             System.err.println("Smth went wrong with files from storage with id " + id);
-            ;
         }
+
+
         File[] filesArray = new File[files.size()];
         return files.toArray(filesArray);
     }

@@ -12,11 +12,15 @@ public class Storage {
 
 
     public Storage(long id, String[] formatsSupported, String storageCountry, long storageSize) throws Exception {
-        if (id <= 0 ||  storageSize <= 0) throw new Exception("Please check storage with id " + id +".Some parameters not allow here.");
+        if (id <= 0 ||  storageSize < 0) throw new Exception("Please check storage with id " + id +".Some parameters not allow here.");
         this.id = id;
         this.formatsSupported = formatsSupported;
         this.storageCountry = storageCountry;
         this.storageSize = storageSize;
+    }
+
+    public Storage(long id) {
+        this.id = id;
     }
 
     public long getId() {

@@ -11,7 +11,5 @@ public class HibernateUtils {
         return new Configuration().configure().buildSessionFactory();
     }
 
-    public void shutDown(){
-        sessionFactory.close();
-    }
+
 }

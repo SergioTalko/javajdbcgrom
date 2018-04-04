@@ -76,37 +76,69 @@ public class ProductDAO {
     }
 
     public void saveAll(List<Product> products) {
-
-    }
-
-    public void updateAll(List<Product> products) {
-
-    }
-
-    public void deleteAll(List<Product> products) {
-
-    }
-
-
-    /*private Product findProductById(long id) {
-
+        if (products == null) throw new NullPointerException("Input data is null");
         Session session = null;
-        Product result = null;
-
+        Transaction transaction = null;
 
         try {
             session = createSessionFactory().openSession();
-            result = session.get(Product.class, id);
-
+            transaction = session.getTransaction();
+            transaction.begin();
+            for (Product product : products) {
+                if (product != null) session.save(product);
+            }
+            transaction.commit();
         } catch (HibernateException e) {
-            System.err.println("Product with id " + id + " cant find");
+            System.err.println("Cant save list of products");
             e.printStackTrace();
+            if (transaction != null) transaction.rollback();
         } finally {
             if (session != null) closeSessionFactory();
         }
+    }
 
-        return result;
-    }*/
+    public void updateAll(List<Product> products) {
+        if (products == null) throw new NullPointerException("Input data is null");
+        Session session = null;
+        Transaction transaction = null;
+
+        try {
+            session = createSessionFactory().openSession();
+            transaction = session.getTransaction();
+            transaction.begin();
+            for (Product product : products) {
+                if (product != null) session.saveOrUpdate(product);
+            }
+            transaction.commit();
+        } catch (HibernateException e) {
+            System.err.println("Cant update list of products");
+            e.printStackTrace();
+            if (transaction != null) transaction.rollback();
+        } finally {
+            if (session != null) closeSessionFactory();
+        }
+    }
+
+    public void deleteAll(List<Product> products) {
+        Session session = null;
+        Transaction transaction = null;
+
+        try {
+            session = createSessionFactory().openSession();
+            transaction = session.getTransaction();
+            transaction.begin();
+            for (Product product : products) {
+               if (product != null) session.delete(product);
+            }
+            transaction.commit();
+        } catch (Exception e) {
+            System.err.println("Cant delete product from list");
+            e.printStackTrace();
+            if (transaction != null) transaction.rollback();
+        } finally {
+            if (session != null) closeSessionFactory();
+        }
+    }
 
 
     private void closeSessionFactory() {

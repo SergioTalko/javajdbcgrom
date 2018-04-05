@@ -1,4 +1,4 @@
-package lesson6;
+package lesson6.task1;
 
 import org.hibernate.*;
 import org.hibernate.cfg.Configuration;

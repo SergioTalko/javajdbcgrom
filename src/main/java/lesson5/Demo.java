@@ -13,7 +13,7 @@ public class Demo {
 
 
     private static void save(Product product) {
-        
+
         Session session = createSessionFactory().openSession();
 
         session.getTransaction().begin();

@@ -6,6 +6,6 @@ public class Demo {
 
         ProductDAO productDAO = new ProductDAO();
 
-        System.out.println( productDAO.findByName("change3"));
+        System.out.println( productDAO.findByPriceSortedDesc(5,10));
     }
 }

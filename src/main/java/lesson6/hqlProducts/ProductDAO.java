@@ -41,7 +41,7 @@ public class ProductDAO {
         return res.get(0);
     }
 
-    public List<Product> findByName(String name) throws Exception{
+    public List<Product> findByName(String name) throws Exception {
         if (name == null) throw new NoSuchFieldException("Check your input name , it would not be null!");
 
         Session session = null;
@@ -63,6 +63,132 @@ public class ProductDAO {
         }
 
         if (res.size() < 1) throw new NotFoundException("Cant find product with name " + name + " in DB ");
+
+        return res;
+    }
+
+    public List<Product> findByContainedName(String name) throws Exception {
+        if (name == null) throw new NoSuchFieldException("Check your input name , it would not be null!");
+
+        Session session = null;
+        List<Product> res = new ArrayList<>();
+
+        try {
+            session = createSessionFactory().openSession();
+
+            Query query = session.createQuery("from Product where name like ?1 ");
+            query.setParameter(1, "%" + name + "%");
+            res = query.getResultList();
+
+        } catch (HibernateException e) {
+            System.err.println("Smth went wrong");
+            e.printStackTrace();
+
+        } finally {
+            if (session != null) closeSessionFactory();
+        }
+
+        if (res.size() < 1) throw new NotFoundException("Cant find product with name like " + name + " in DB ");
+
+        return res;
+    }
+
+    public List<Product> findByPrice(int price, int delta) throws Exception {
+        if (price <= 0 || delta <= 0) throw new Exception("Check your input price and delta , they incorrect!");
+
+        Session session = null;
+        List<Product> res = new ArrayList<>();
+
+        try {
+            session = createSessionFactory().openSession();
+
+            Query query = session.createQuery("from Product a where a.price between :start and :finish ");
+            query.setParameter("start" , price - delta);
+            query.setParameter("finish" , price + delta);
+            res = query.getResultList();
+
+        } catch (HibernateException e) {
+            System.err.println("Smth went wrong");
+            e.printStackTrace();
+
+        } finally {
+            if (session != null) closeSessionFactory();
+        }
+
+        if (res.size() < 1) throw new NotFoundException("Cant find product with price between this price in DB ");
+
+        return res;
+    }
+
+    public List<Product> findByNameSortedAsc(){
+
+        Session session = null;
+        List<Product> res = new ArrayList<>();
+
+        try {
+            session = createSessionFactory().openSession();
+
+            Query query = session.createQuery("from Product  order by name asc ");
+
+            res = query.getResultList();
+
+        } catch (HibernateException e) {
+            System.err.println("Smth went wrong");
+            e.printStackTrace();
+
+        } finally {
+            if (session != null) closeSessionFactory();
+        }
+
+        return res;
+    }
+
+    public List<Product> findByNameSortedDesc(){
+
+        Session session = null;
+        List<Product> res = new ArrayList<>();
+
+        try {
+            session = createSessionFactory().openSession();
+
+            Query query = session.createQuery("from Product  order by name desc ");
+
+            res = query.getResultList();
+
+        } catch (HibernateException e) {
+            System.err.println("Smth went wrong");
+            e.printStackTrace();
+
+        } finally {
+            if (session != null) closeSessionFactory();
+        }
+
+        return res;
+    }
+
+    public List<Product> findByPriceSortedDesc(int price, int delta) throws Exception{
+        if (price <= 0 || delta <= 0) throw new Exception("Check your input price and delta , they incorrect!");
+
+        Session session = null;
+        List<Product> res = new ArrayList<>();
+
+        try {
+            session = createSessionFactory().openSession();
+
+            Query query = session.createQuery("from Product a where a.price between :start and :finish order by price desc ");
+            query.setParameter("start" , price - delta);
+            query.setParameter("finish" , price + delta);
+            res = query.getResultList();
+
+        } catch (HibernateException e) {
+            System.err.println("Smth went wrong");
+            e.printStackTrace();
+
+        } finally {
+            if (session != null) closeSessionFactory();
+        }
+
+        if (res.size() < 1) throw new NotFoundException("Cant find product with price between this price in DB ");
 
         return res;
     }

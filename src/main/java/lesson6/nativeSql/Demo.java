@@ -5,5 +5,9 @@ public class Demo {
         ProductDAO productDAO = new ProductDAO();
 
         System.out.println(productDAO.findById((long)50));
+//        System.out.println(productDAO.findByName("change3"));
+//        System.out.println(productDAO.findByContainedName("change3"));
+//        System.out.println(productDAO.findByNameSortedAsc());
+//        System.out.println(productDAO.findByPrice(5,5));
     }
 }

@@ -6,6 +6,7 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.query.NativeQuery;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +24,7 @@ public class ProductDAO {
         try {
             session = createSessionFactory().openSession();
 
-            SQLQuery query = session.createSQLQuery("SELECT * FROM Product WHERE ID = :id ");
+            NativeQuery query = session.createNativeQuery("SELECT * FROM Product WHERE ID = :id ");
             query.setParameter("id", id);
             query.addEntity(Product.class);
             res = query.list();
@@ -51,7 +52,7 @@ public class ProductDAO {
             session = createSessionFactory().openSession();
 
 
-            SQLQuery query = session.createSQLQuery("SELECT * FROM Product WHERE NAME = :name ");
+            NativeQuery query = session.createNativeQuery("SELECT * FROM Product WHERE NAME = :name ");
             query.setParameter("name", name);
             query.addEntity(Product.class);
             res = query.list();
@@ -78,7 +79,7 @@ public class ProductDAO {
         try {
             session = createSessionFactory().openSession();
 
-            SQLQuery query = session.createSQLQuery("select * from Product where name like ?1 ");
+            NativeQuery query = session.createNativeQuery("SELECT * FROM Product WHERE NAME like ?1 ");
             query.setParameter(1, "%" + name + "%");
             query.addEntity(Product.class);
             res = query.getResultList();
@@ -105,7 +106,7 @@ public class ProductDAO {
         try {
             session = createSessionFactory().openSession();
 
-            SQLQuery query = session.createSQLQuery("SELECT  * from Product a where a.price between :start and :finish ");
+            NativeQuery query = session.createNativeQuery("SELECT  * FROM Product WHERE PRICE between :start and :finish ");
             query.setParameter("start" , price - delta);
             query.setParameter("finish" , price + delta);
             query.addEntity(Product.class);
@@ -132,7 +133,7 @@ public class ProductDAO {
         try {
             session = createSessionFactory().openSession();
 
-            SQLQuery query = session.createSQLQuery("SELECT * from Product  order by NAME asc ");
+            NativeQuery query = session.createNativeQuery("SELECT * from Product  order by NAME asc ");
             query.addEntity(Product.class);
             res = query.getResultList();
 
@@ -155,7 +156,7 @@ public class ProductDAO {
         try {
             session = createSessionFactory().openSession();
 
-            SQLQuery query = session.createSQLQuery("SELECT  * from Product  order by name desc ");
+            NativeQuery query = session.createNativeQuery("SELECT  * from Product  order by name desc ");
             query.addEntity(Product.class);
             res = query.getResultList();
 
@@ -179,7 +180,7 @@ public class ProductDAO {
         try {
             session = createSessionFactory().openSession();
 
-            SQLQuery query = session.createSQLQuery("SELECT * from Product a where a.price between :start and :finish order by price desc ");
+            NativeQuery query = session.createNativeQuery("SELECT * from Product a where a.price between :start and :finish order by price desc ");
             query.setParameter("start" , price - delta);
             query.setParameter("finish" , price + delta);
             query.addEntity(Product.class);

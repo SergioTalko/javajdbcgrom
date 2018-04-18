@@ -1,8 +1,6 @@
 package lesson6.nativeSql;
 
-import javassist.NotFoundException;
 import org.hibernate.HibernateException;
-import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -15,44 +13,44 @@ public class ProductDAO {
 
     private SessionFactory sessionFactory;
 
+    private final String FIND_BY_ID = "SELECT * FROM Product WHERE id = :id";
+    private final String FIND_BY_NAME = "SELECT * FROM Product WHERE name = :name";
+    private final String FIND_BY_CONTAINED_NAME = "SELECT * FROM Product WHERE name LIKE ?1";
+    private final String FIND_BY_PRICE = "SELECT * FROM Product WHERE price BETWEEN  :start AND :finish";
+    private final String FIND_BY_NAME_SORTED_ASC = "SELECT * FROM Product ORDER BY name ASC";
+    private final String FIND_BY_NAME_SORTED_DESC = "SELECT * FROM Product ORDER BY name DESC";
+    private final String FIND_BY_PRICE_SORTED_ASC = "SELECT * FROM Product WHERE price BETWEEN :start AND :finish ORDER BY price DESC";
+
     public Product findById(Long id) throws Exception {
         if (id <= 0) throw new NoSuchFieldException("Check your input id , it would be more than 0");
 
-        Session session = null;
-        List<Product> res = new ArrayList<>();
+        Product res = null;
 
-        try {
-            session = createSessionFactory().openSession();
+        try (Session session = createSessionFactory().openSession()) {
 
-            NativeQuery query = session.createNativeQuery("SELECT * FROM Product WHERE ID = :id ");
+            NativeQuery query = session.createNativeQuery(FIND_BY_ID);
             query.setParameter("id", id);
             query.addEntity(Product.class);
-            res = query.list();
+            res = (Product) query.getSingleResult();
 
         } catch (HibernateException e) {
             System.err.println("Smth went wrong");
             e.printStackTrace();
-
-        } finally {
-            if (session != null) closeSessionFactory();
         }
 
-        if (res.size() < 1) throw new NotFoundException("Cant find product with id " + id + " in DB ");
-        if (res.size() > 1) throw new Exception("In DB more than 1 products with id " + id);
-        return res.get(0);
+        if (res == null) System.out.println("Cant find product with id " + id + " in DB ");
+
+        return res;
     }
 
     public List<Product> findByName(String name) throws Exception {
         if (name == null) throw new NoSuchFieldException("Check your input name , it would not be null!");
 
-        Session session = null;
         List<Product> res = new ArrayList<>();
 
-        try {
-            session = createSessionFactory().openSession();
+        try (Session session = createSessionFactory().openSession()) {
 
-
-            NativeQuery query = session.createNativeQuery("SELECT * FROM Product WHERE NAME = :name ");
+            NativeQuery query = session.createNativeQuery(FIND_BY_NAME);
             query.setParameter("name", name);
             query.addEntity(Product.class);
             res = query.list();
@@ -61,11 +59,9 @@ public class ProductDAO {
             System.err.println("Smth went wrong");
             e.printStackTrace();
 
-        } finally {
-            if (session != null) closeSessionFactory();
         }
 
-        if (res.size() < 1) throw new NotFoundException("Cant find product with name " + name + " in DB ");
+        if (res.size() < 1) System.out.println("Cant find product with name " + name + " in DB ");
 
         return res;
     }
@@ -73,13 +69,11 @@ public class ProductDAO {
     public List<Product> findByContainedName(String name) throws Exception {
         if (name == null) throw new NoSuchFieldException("Check your input name , it would not be null!");
 
-        Session session = null;
         List<Product> res = new ArrayList<>();
 
-        try {
-            session = createSessionFactory().openSession();
+        try (Session session = createSessionFactory().openSession()) {
 
-            NativeQuery query = session.createNativeQuery("SELECT * FROM Product WHERE NAME like ?1 ");
+            NativeQuery query = session.createNativeQuery(FIND_BY_CONTAINED_NAME);
             query.setParameter(1, "%" + name + "%");
             query.addEntity(Product.class);
             res = query.getResultList();
@@ -88,11 +82,9 @@ public class ProductDAO {
             System.err.println("Smth went wrong");
             e.printStackTrace();
 
-        } finally {
-            if (session != null) closeSessionFactory();
         }
 
-        if (res.size() < 1) throw new NotFoundException("Cant find product with name like " + name + " in DB ");
+        if (res.size() < 1) System.out.println("Cant find product with name like " + name + " in DB ");
 
         return res;
     }
@@ -100,15 +92,13 @@ public class ProductDAO {
     public List<Product> findByPrice(int price, int delta) throws Exception {
         if (price <= 0 || delta <= 0) throw new Exception("Check your input price and delta , they incorrect!");
 
-        Session session = null;
         List<Product> res = new ArrayList<>();
 
-        try {
-            session = createSessionFactory().openSession();
+        try (Session session = createSessionFactory().openSession()) {
 
-            NativeQuery query = session.createNativeQuery("SELECT  * FROM Product WHERE PRICE between :start and :finish ");
-            query.setParameter("start" , price - delta);
-            query.setParameter("finish" , price + delta);
+            NativeQuery query = session.createNativeQuery(FIND_BY_PRICE);
+            query.setParameter("start", price - delta);
+            query.setParameter("finish", price + delta);
             query.addEntity(Product.class);
             res = query.list();
 
@@ -116,73 +106,33 @@ public class ProductDAO {
             System.err.println("Smth went wrong");
             e.printStackTrace();
 
-        } finally {
-            if (session != null) closeSessionFactory();
         }
 
-        if (res.size() < 1) throw new NotFoundException("Cant find product with price between this price in DB ");
+        if (res.size() < 1) System.out.println("Cant find product with price between this price in DB ");
 
         return res;
     }
 
-    public List<Product> findByNameSortedAsc(){
+    public List<Product> findByNameSortedAsc() {
 
-        Session session = null;
-        List<Product> res = new ArrayList<>();
-
-        try {
-            session = createSessionFactory().openSession();
-
-            NativeQuery query = session.createNativeQuery("SELECT * from Product  order by NAME asc ");
-            query.addEntity(Product.class);
-            res = query.getResultList();
-
-        } catch (HibernateException e) {
-            System.err.println("Smth went wrong");
-            e.printStackTrace();
-
-        } finally {
-            if (session != null) closeSessionFactory();
-        }
-
-        return res;
+        return sortedName(FIND_BY_NAME_SORTED_ASC);
     }
 
-    public List<Product> findByNameSortedDesc(){
+    public List<Product> findByNameSortedDesc() {
 
-        Session session = null;
-        List<Product> res = new ArrayList<>();
-
-        try {
-            session = createSessionFactory().openSession();
-
-            NativeQuery query = session.createNativeQuery("SELECT  * from Product  order by name desc ");
-            query.addEntity(Product.class);
-            res = query.getResultList();
-
-        } catch (HibernateException e) {
-            System.err.println("Smth went wrong");
-            e.printStackTrace();
-
-        } finally {
-            if (session != null) closeSessionFactory();
-        }
-
-        return res;
+        return sortedName(FIND_BY_NAME_SORTED_DESC);
     }
 
-    public List<Product> findByPriceSortedDesc(int price, int delta) throws Exception{
+    public List<Product> findByPriceSortedDesc(int price, int delta) throws Exception {
         if (price <= 0 || delta <= 0) throw new Exception("Check your input price and delta , they incorrect!");
 
-        Session session = null;
         List<Product> res = new ArrayList<>();
 
-        try {
-            session = createSessionFactory().openSession();
+        try (Session session = createSessionFactory().openSession()) {
 
-            NativeQuery query = session.createNativeQuery("SELECT * from Product a where a.price between :start and :finish order by price desc ");
-            query.setParameter("start" , price - delta);
-            query.setParameter("finish" , price + delta);
+            NativeQuery query = session.createNativeQuery(FIND_BY_PRICE_SORTED_ASC);
+            query.setParameter("start", price - delta);
+            query.setParameter("finish", price + delta);
             query.addEntity(Product.class);
             res = query.getResultList();
 
@@ -190,15 +140,31 @@ public class ProductDAO {
             System.err.println("Smth went wrong");
             e.printStackTrace();
 
-        } finally {
-            if (session != null) closeSessionFactory();
         }
 
-        if (res.size() < 1) throw new NotFoundException("Cant find product with price between this price in DB ");
+        if (res.size() < 1) System.out.println("Cant find product with price between this price in DB ");
 
         return res;
     }
 
+    private List<Product> sortedName(String SQLQuery) {
+
+        List<Product> res = new ArrayList<>();
+
+        try (Session session = createSessionFactory().openSession()) {
+
+            NativeQuery query = session.createNativeQuery(SQLQuery);
+            query.addEntity(Product.class);
+            res = query.getResultList();
+
+        } catch (HibernateException e) {
+            System.err.println("Smth went wrong");
+            e.printStackTrace();
+
+        }
+
+        return res;
+    }
 
     private SessionFactory createSessionFactory() {
         if (sessionFactory == null) {

@@ -52,6 +52,23 @@ public class GeneralDAO<T> {
         }
     }
 
+    public void delete(long id){
+        Transaction transaction = null;
+
+        try (SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
+             Session session = sessionFactory.openSession()) {
+
+            transaction = session.beginTransaction();
+            session.delete(findById(id));
+            transaction.commit();
+        } catch (HibernateException e) {
+            System.err.println("Something went wrong");
+            e.printStackTrace();
+            if (transaction != null) transaction.rollback();
+
+        }
+    }
+
 
     public T findById(long id){
 
@@ -61,7 +78,7 @@ public class GeneralDAO<T> {
              Session session = sessionFactory.openSession()) {
 
 
-            Query query = session.createQuery(getQuery(tableName));
+            Query query = session.createQuery(getQueryFindById(tableName));
             query.setParameter("id", id);
             res = (T) query.getSingleResult();
 
@@ -74,7 +91,7 @@ public class GeneralDAO<T> {
         return res;
     }
 
-    private String getQuery(String tableName) {
+    private String getQueryFindById(String tableName) {
         return "FROM " + tableName + " WHERE id = :id ";
     }
 

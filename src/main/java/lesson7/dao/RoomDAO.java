@@ -1,4 +1,10 @@
 package lesson7.dao;
 
-public class RoomDAO {
+import lesson7.entity.Room;
+
+public class RoomDAO extends GeneralDAO<Room> {
+
+    public RoomDAO() {
+        setTableName("Room");
+    }
 }

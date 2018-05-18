@@ -1,41 +1,58 @@
 package lesson8.entity;
 
+
+import javax.persistence.*;
 import java.util.Date;
 
-
+@Entity
+@Table(name = "ORDERS")
 public class Order {
     private long id;
     private User user;
     private Room room;
     private Date dateFrom;
     private Date dateTo;
-    private int moneyPaid;
+    private double moneyPaid;
 
-
+    @Id
+    @SequenceGenerator(name = "ORDER_SEQ", sequenceName = "O_SEQ", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "ORDER_SEQ")
+    @Column(name = "ORDER_ID")
     public long getId() {
         return id;
     }
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "USER_ID")
     public User getUser() {
         return user;
     }
-
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "Room_ID", referencedColumnName = "Room_ID")
     public Room getRoom() {
         return room;
     }
 
+
+    @Temporal(TemporalType.DATE)
+    @Column(name = "DATE_FROM" )
     public Date getDateFrom() {
         return dateFrom;
     }
 
+
+    @Temporal(TemporalType.DATE)
+    @Column(name = "DATE_TO")
     public Date getDateTo() {
         return dateTo;
     }
 
-    public int getMoneyPaid() {
+    @Column(name = "MONEY_PAID")
+    public double getMoneyPaid() {
         return moneyPaid;
     }
-    //--SETTERS
+    //--Setters
+
 
     public void setId(long id) {
         this.id = id;
@@ -57,7 +74,7 @@ public class Order {
         this.dateTo = dateTo;
     }
 
-    public void setMoneyPaid(int moneyPaid) {
+    public void setMoneyPaid(double moneyPaid) {
         this.moneyPaid = moneyPaid;
     }
 }

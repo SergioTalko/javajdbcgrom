@@ -7,6 +7,8 @@ import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.query.Query;
 
+import java.util.*;
+
 
 public class GeneralDAO<T> {
 
@@ -72,6 +74,7 @@ public class GeneralDAO<T> {
     }
 
 
+    @SuppressWarnings("unchecked")
     public T findById(long id) {
 
         T res = null;
@@ -93,8 +96,55 @@ public class GeneralDAO<T> {
         return res;
     }
 
+    @SuppressWarnings("unchecked")
+    public List<T> getAll() {
+
+        List<T> res = new LinkedList<>();
+
+        try (SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
+             Session session = sessionFactory.openSession()) {
+
+
+            Query query = session.createQuery(getAll(tableName));
+
+            res = query.list();
+
+        } catch (HibernateException e) {
+            System.err.println("Smth went wrong");
+            e.printStackTrace();
+        }
+
+        return res;
+    }
+
+
+    private String getAll(String tableName){
+        return "FROM " + tableName;
+    }
+
     private String getQueryFindById(String tableName) {
         return "FROM " + tableName + " WHERE id = :id ";
+    }
+
+    public List<T> selectByOneParameter(Object obj1, String SQL) {
+
+        List<T> res = new ArrayList();
+
+        try (SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
+             Session session = sessionFactory.openSession()) {
+
+            Query query = session.createQuery(SQL);
+            query.setParameter("param", obj1);
+
+            res = query.getResultList();
+
+        } catch (HibernateException e) {
+            System.err.println("Smth went wrong");
+            e.printStackTrace();
+
+        }
+
+        return res;
     }
 
     public void setTableName(String tableName) {

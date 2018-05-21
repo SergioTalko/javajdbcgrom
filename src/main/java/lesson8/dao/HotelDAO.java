@@ -14,24 +14,6 @@ public class HotelDAO extends GeneralDAO<Hotel> {
     }
 
 
-  /*  public Hotel get(Hotel hotel) {
-        Transaction transaction = null;
-        Hotel hotel1 = null;
-        try (SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
-             Session session = sessionFactory.openSession()) {
-
-            transaction = session.beginTransaction();
-            hotel1 = (Hotel) session.get(hotel.getName(), hotel.getId());
-            transaction.commit();
-        } catch (HibernateException e) {
-            System.err.println("Something went wrong");
-            e.printStackTrace();
-            if (transaction != null) transaction.rollback();
-
-        }
-        return hotel1;
-    }*/
-
     public List<Hotel> findHotelByName(String name) {
         return selectByOneParameter(name, FIND_BY_NAME);
     }

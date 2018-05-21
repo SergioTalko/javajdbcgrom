@@ -3,6 +3,7 @@ package lesson8.entity;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -40,6 +41,7 @@ public class User {
     }
 
     @Column(name = "USER_TYPE")
+    @Enumerated(EnumType.STRING)
     public UserType getUserType() {
         return userType;
     }
@@ -73,5 +75,20 @@ public class User {
 
     public void setOrders(Set<Order> orders) {
         this.orders = orders;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(userName, user.userName) &&
+                Objects.equals(password, user.password);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(userName, password);
     }
 }

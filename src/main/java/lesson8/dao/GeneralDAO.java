@@ -25,7 +25,7 @@ public class GeneralDAO<T> {
              Session session = sessionFactory.openSession()) {
 
             transaction = session.beginTransaction();
-            session.saveOrUpdate(t);
+            session.save(t);
             transaction.commit();
         } catch (HibernateException e) {
             System.err.println("Something went wrong");

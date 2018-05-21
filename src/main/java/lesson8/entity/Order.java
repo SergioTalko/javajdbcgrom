@@ -14,6 +14,15 @@ public class Order {
     private Date dateTo;
     private double moneyPaid;
 
+    public Order() {
+    }
+
+    public Order(User user, Room room, Date dateTo) {
+        this.user = user;
+        this.room = room;
+        this.dateTo = dateTo;
+    }
+
     @Id
     @SequenceGenerator(name = "ORDER_SEQ", sequenceName = "O_SEQ", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "ORDER_SEQ")

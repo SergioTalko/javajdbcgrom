@@ -12,6 +12,10 @@ import java.util.Date;
 
 public class OrderDAO extends GeneralDAO<Order> {
 
+    private final String FIND_BY_ID = "FROM Order WHERE id = :id ";
+    private final String DELETE_BY_ID = "DELETE FROM Order WHERE id = :id";
+
+
     private UserDAO userDAO;
 
 
@@ -20,6 +24,11 @@ public class OrderDAO extends GeneralDAO<Order> {
     }
 
 
+    public Order findById(long id) {
+        return super.findById(id, FIND_BY_ID);
+    }
 
-
+    public void delete(long id) {
+        super.delete(id, DELETE_BY_ID);
+    }
 }

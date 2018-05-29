@@ -8,6 +8,8 @@ public class HotelDAO extends GeneralDAO<Hotel> {
 
     private final String FIND_BY_NAME = "FROM Hotel WHERE name = :param";
     private final String FIND_BY_CITY = "FROM Hotel WHERE city = :param";
+    private final String FIND_BY_ID = "FROM Hotel WHERE id = :id ";
+    private final String DELETE_BY_ID = "DELETE FROM Hotel WHERE id = :id";
 
     public HotelDAO() {
         setTableName("Hotel");
@@ -18,9 +20,15 @@ public class HotelDAO extends GeneralDAO<Hotel> {
         return selectByOneParameter(name, FIND_BY_NAME);
     }
 
-    public List<Hotel> findHotelByCity(String city){
+    public List<Hotel> findHotelByCity(String city) {
         return selectByOneParameter(city, FIND_BY_CITY);
     }
 
+    public Hotel findById(long id) {
+        return findById(id, FIND_BY_ID);
+    }
 
+    public void delete(long id) {
+        super.delete(id, DELETE_BY_ID);
+    }
 }

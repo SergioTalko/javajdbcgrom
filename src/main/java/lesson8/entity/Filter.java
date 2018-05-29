@@ -6,8 +6,8 @@ public class Filter {
 
     private int numberOfGuests;
     private double price;
-    private int breakfastIncluded;
-    private int petsAllowed;
+    private int breakfastIncluded = -1; //this -1 needs to filtering all rooms by HotelName for example(coz its 0 or 1)
+    private int petsAllowed = -1;
     private Date dateAvailableFrom;
     private String hotelName;
     private String country;
@@ -16,7 +16,7 @@ public class Filter {
     public Filter() {
     }
 
-    public Filter(int numberOfGuests, double price,int breakfastIncluded, int petsAllowed, Date dateAvailableFrom, String hotelName, String country, String city) {
+    public Filter(int numberOfGuests, double price, int breakfastIncluded, int petsAllowed, Date dateAvailableFrom, String hotelName, String country, String city) {
         this.numberOfGuests = numberOfGuests;
         this.price = price;
         this.breakfastIncluded = breakfastIncluded;
@@ -26,7 +26,6 @@ public class Filter {
         this.country = country;
         this.city = city;
     }
-
 
 
     public boolean findRoomByFilter(Room room) {
@@ -45,6 +44,38 @@ public class Filter {
 
     }
 
+
+    public int getNumberOfGuests() {
+        return numberOfGuests;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public int getBreakfastIncluded() {
+        return breakfastIncluded;
+    }
+
+    public int getPetsAllowed() {
+        return petsAllowed;
+    }
+
+    public Date getDateAvailableFrom() {
+        return dateAvailableFrom;
+    }
+
+    public String getHotelName() {
+        return hotelName;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public String getCity() {
+        return city;
+    }
 
     public void setNumberOfGuests(int numberOfGuests) {
         this.numberOfGuests = numberOfGuests;

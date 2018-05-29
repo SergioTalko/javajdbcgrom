@@ -56,14 +56,14 @@ public class GeneralDAO<T> {
 
 
 
-    public void delete(long id) {
+    public void delete(long id, String sql) {
         Transaction transaction = null;
 
         try (SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
              Session session = sessionFactory.openSession()) {
 
             transaction = session.beginTransaction();
-            session.delete(findById(id));
+            session.delete(sql);
             transaction.commit();
         } catch (HibernateException e) {
             System.err.println("Something went wrong");
@@ -75,7 +75,7 @@ public class GeneralDAO<T> {
 
 
     @SuppressWarnings("unchecked")
-    public T findById(long id) {
+    public T findById(long id, String sql) {
 
         T res = null;
 
@@ -83,7 +83,7 @@ public class GeneralDAO<T> {
              Session session = sessionFactory.openSession()) {
 
 
-            Query query = session.createQuery(getQueryFindById(tableName));
+            Query query = session.createQuery(sql);
             query.setParameter("id", id);
             res = (T) query.getSingleResult();
 
@@ -120,10 +120,6 @@ public class GeneralDAO<T> {
 
     private String getAll(String tableName){
         return "FROM " + tableName;
-    }
-
-    private String getQueryFindById(String tableName) {
-        return "FROM " + tableName + " WHERE id = :id ";
     }
 
     public List<T> selectByOneParameter(Object obj1, String SQL) {

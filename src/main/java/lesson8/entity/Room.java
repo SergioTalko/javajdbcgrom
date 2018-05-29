@@ -100,7 +100,8 @@ public class Room {
                 ", breakfastIncluded=" + breakfastIncluded +
                 ", petsAllowed=" + petsAllowed +
                 ", dateAvailableFrom=" + dateAvailableFrom +
-                ", hotel=" + hotel.getId() +
+                ", hotelName=" + hotel.getName() +
+                ", hotelId=" + hotel.getId() +
                 '}';
     }
 }

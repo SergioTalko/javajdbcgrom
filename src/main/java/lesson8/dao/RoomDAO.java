@@ -1,5 +1,6 @@
 package lesson8.dao;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lesson8.entity.Filter;
 import lesson8.entity.Hotel;
 import lesson8.entity.Room;
@@ -9,11 +10,12 @@ import org.hibernate.criterion.Conjunction;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Expression;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class RoomDAO extends GeneralDAO<Room> {
 
@@ -30,7 +32,7 @@ public class RoomDAO extends GeneralDAO<Room> {
 
 
     @SuppressWarnings("uncheked")
-    public List<Room> findRooms(Filter filter) {
+   /* public List<Room> findRooms(Filter filter) {
 
         List<Room> rooms = null;
 
@@ -58,8 +60,8 @@ public class RoomDAO extends GeneralDAO<Room> {
                 criteria.add(Restrictions.eq("dateAvailableFrom", filter.getDateAvailableFrom()));
 
 
-            if (filter.getHotelName() != null)
-                criteria.add(Restrictions.eq("hotel.name", filter.getHotelName()));
+            if (filter.getName() != null)
+                criteria.add(Restrictions.eq("hotel.name", filter.getName()));
 
             if (filter.getCountry() != null)
                 criteria.add(Restrictions.eq("hotel.country", filter.getCountry()));
@@ -77,6 +79,49 @@ public class RoomDAO extends GeneralDAO<Room> {
         }
         return rooms;
 
+    }*/
+
+
+    public List<Room> findRooms(Filter filter) {
+
+        List<Room> rooms = null;
+        try (SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
+             Session session = sessionFactory.openSession()) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            Map<String, Object> filterParams = objectMapper.convertValue(filter, Map.class);
+
+            CriteriaBuilder builder = session.getCriteriaBuilder();
+            CriteriaQuery<Room> criteriaQuery = builder.createQuery(Room.class);
+
+            Root<Room> roomRoot = criteriaQuery.from(Room.class);
+            Join<Hotel, Room> joinHotel = roomRoot.join("hotel"); 
+
+
+            Predicate predicate = builder.conjunction();
+
+
+            for (String param : filterParams.keySet()) {
+                if (filterParams.get(param) != null) {
+
+                    if (param.equals("name") || param.equals("country") || param.equals("city")) {
+                        predicate = builder.and(predicate, builder.equal(
+                                joinHotel.get(param), filterParams.get(param)));
+                    } else {
+
+                        predicate = builder.and(predicate, builder.equal(
+                                roomRoot.get(param), filterParams.get(param)));
+                    }
+                }
+            }
+            criteriaQuery.select(roomRoot).where(predicate);
+
+            rooms = session.createQuery(criteriaQuery).getResultList();
+
+        } catch (HibernateException e) {
+            e.printStackTrace();
+            System.err.println("Smth went wrong");
+        }
+        return rooms;
     }
 
 
